@@ -35,10 +35,11 @@ namespace PNGParvusTest
         static void Main(string[] args)
         {
             Stopwatch stopwatch = new Stopwatch();
+            string path = Environment.CurrentDirectory + @"\test.png";
             stopwatch.Start();
-            PNGParvus.Write<TestImage, Color>(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + @"\test.png", new TestImage());
+            PNGParvus.Write<TestImage, Color>(path, new TestImage());
             stopwatch.Stop();
-            Console.WriteLine(stopwatch.ElapsedMilliseconds);
+            Console.WriteLine(stopwatch.ElapsedMilliseconds+"ms Elapsed");
         }
     }
 }

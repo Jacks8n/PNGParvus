@@ -17,7 +17,7 @@ namespace PNGParuvs
             using FileStream stream = File.Create(path.ToString());
             Write<TPNG, TColor, FileStream>(stream, png);
         }
-        public static unsafe void Write<TPNG, TColor, TStream>(TStream stream, TPNG png) where TPNG : IPNG<TColor> where TStream : FileStream where TColor : unmanaged
+        public static unsafe void Write<TPNG, TColor, TStream>(TStream stream, TPNG png) where TPNG : IPNG<TColor> where TStream : Stream where TColor : unmanaged
         {
             if (((sizeof(TColor) - 3) & (~0 - 1)) > 0)
                 throw new Exception("Size of TColor may be 3 or 4");
@@ -48,42 +48,42 @@ namespace PNGParuvs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe void WriteValue<TStream, TValue>(TStream stream, TValue value) where TStream : FileStream where TValue : unmanaged
+        private static unsafe void WriteValue<TStream, TValue>(TStream stream, TValue value) where TStream : Stream where TValue : unmanaged
         {
             for (int i = sizeof(TValue) - 1; i > -1; stream.WriteByte(((byte*)&value)[i--])) ;
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void WriteByteCRC<TStream>(TStream stream, byte value) where TStream : FileStream
+        private static void WriteByteCRC<TStream>(TStream stream, byte value) where TStream : Stream
         {
             static void crc() => _crc32 = (_crc32 >> 4) ^ CRC32_TABLE[_crc32 & 0xF];
             stream.WriteByte(value);
             _crc32 ^= value; crc(); crc();
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void WriteByteAdler<TStream>(TStream stream, byte value) where TStream : FileStream
+        private static void WriteByteAdler<TStream>(TStream stream, byte value) where TStream : Stream
         {
             WriteByteCRC(stream, value);
             _adlerA = _adlerA + value > 65521 ? _adlerA + value - 65521 : _adlerA + value;
             _adlerB = _adlerA + _adlerB > 65521 ? _adlerA + _adlerB - 65521 : _adlerA + _adlerB;
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe void WriteValueCRC<TStream, TValue>(TStream stream, TValue value) where TStream : FileStream where TValue : unmanaged
+        private static unsafe void WriteValueCRC<TStream, TValue>(TStream stream, TValue value) where TStream : Stream where TValue : unmanaged
         {
             for (int i = sizeof(TValue) - 1; i > -1; WriteByteCRC(stream, ((byte*)&value)[i--])) ;
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe void WriteValueAdler<TStream, TValue>(TStream stream, TValue value) where TStream : FileStream where TValue : unmanaged
+        private static unsafe void WriteValueAdler<TStream, TValue>(TStream stream, TValue value) where TStream : Stream where TValue : unmanaged
         {
             for (int j = 0; j < sizeof(TValue); WriteByteAdler(stream, ((byte*)&value)[j++])) ;
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void WriteChunkBegin<TStream>(TStream stream, ReadOnlySpan<char> type, uint length) where TStream : FileStream
+        private static void WriteChunkBegin<TStream>(TStream stream, ReadOnlySpan<char> type, uint length) where TStream : Stream
         {
             _crc32 = ~0u;
             WriteValue(stream, length);
             for (int i = 0; i < type.Length; WriteByteCRC(stream, (byte)type[i++])) ;
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void WriteChunkEnd<TStream>(TStream stream) where TStream : FileStream => WriteValue(stream, ~_crc32);
+        private static void WriteChunkEnd<TStream>(TStream stream) where TStream : Stream => WriteValue(stream, ~_crc32);
     }
 }

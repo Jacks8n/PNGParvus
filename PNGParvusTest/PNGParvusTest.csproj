@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\pPNGS\PNGParvus.csproj" />
+    <ProjectReference Include="..\PNGParvus\PNGParvus.csproj" />
   </ItemGroup>
 
 </Project>
