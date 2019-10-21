@@ -32,16 +32,16 @@ namespace PNGParuvs
             WriteValueCRC(stream, (sizeof(TColor) == 4 ? 6 : 2) << 24);            //  True color with/without alpha, Deflate compression, No filter, No interlace
             WriteChunkEnd(stream);                                                 //IHDR END
             WriteChunkBegin(stream, "IDAT", 2 + height * (5 + bytesPerRow) + 4);   //IDAT BEGIN
-            WriteValueCRC(stream, (ushort)0x7801);                                 //No Compression
+            WriteValueCRC(stream, (ushort)0x7801);                                 //   No compression
             for (int y = 0; y < height; y++)
             {
-                WriteByteCRC(stream, (byte)(y == height - 1 ? 1 : 0));             //Marker bit for last block
-                WriteValueCRC(stream, codedBytesPerRow);                           //Coded size of block
-                WriteByteAdler(stream, 0);                                         //No filter
+                WriteByteCRC(stream, (byte)(y == height - 1 ? 1 : 0));             //   Marker bit for last block
+                WriteValueCRC(stream, codedBytesPerRow);                           //   Coded size of block
+                WriteByteAdler(stream, 0);                                         //   No filter
                 for (int x = 0; x < width; x++)
-                    WriteValueAdler(stream, png.GetColor(x, y));                   //Write pixel
+                    WriteValueAdler(stream, png.GetColor(x, y));                   //   Write pixel
             }
-            WriteValueCRC(stream, (_adlerB << 16) | _adlerA);                      //Deflate END
+            WriteValueCRC(stream, (_adlerB << 16) | _adlerA);                      //   Deflate END
             WriteChunkEnd(stream);                                                 //IDAT END
             WriteChunkBegin(stream, "IEND", 0); WriteChunkEnd(stream);             //IEND BEGIN & END
             stream.Flush();
@@ -74,7 +74,7 @@ namespace PNGParuvs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static unsafe void WriteValueAdler<TStream, TValue>(TStream stream, TValue value) where TStream : Stream where TValue : unmanaged
         {
-            for (int j = 0; j < sizeof(TValue); WriteByteAdler(stream, ((byte*)&value)[j++])) ;
+            for (int i = 0; i < sizeof(TValue); WriteByteAdler(stream, ((byte*)&value)[i++])) ;
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void WriteChunkBegin<TStream>(TStream stream, ReadOnlySpan<char> type, uint length) where TStream : Stream
